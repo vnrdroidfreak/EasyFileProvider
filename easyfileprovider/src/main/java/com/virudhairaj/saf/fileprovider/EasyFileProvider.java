@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 
 import java.io.File;
@@ -17,12 +19,24 @@ import java.net.URISyntaxException;
 
 public class EasyFileProvider extends FileProvider {
 
-    public static File getFile(Context context, Uri uri) throws URISyntaxException {
-        String path = getPath(context, uri);
+    final Context context;
+
+    private EasyFileProvider(final Context context) {
+        this.context = context;
+    }
+
+    public static EasyFileProvider with(final @NonNull Context context) {
+        return new EasyFileProvider(context);
+    }
+
+    @NonNull
+    public File getFileBy(@NonNull Uri uri) throws Exception {
+        String path = getFilePathBy(uri);
         return new File(path != null ? path : "not found");
     }
 
-    public static Uri getUriForFile(Context context, File file) {
+    @NonNull
+    public Uri getUriBy(@NonNull File file) {
         String provider = context.getPackageName() + "provider";
         return FileProvider.getUriForFile(context, provider, file);
     }
@@ -31,7 +45,8 @@ public class EasyFileProvider extends FileProvider {
      * Gets the file path of the given Uri.
      */
     @SuppressLint("NewApi")
-    public static String getPath(Context context, Uri uri) throws URISyntaxException {
+    @Nullable
+    public String getFilePathBy(@NonNull Uri uri) throws URISyntaxException {
         final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
         String selection = null;
         String[] selectionArgs = null;
@@ -90,7 +105,7 @@ public class EasyFileProvider extends FileProvider {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
      */
-    public static boolean isExternalStorageDocument(Uri uri) {
+    public static boolean isExternalStorageDocument(@NonNull Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
@@ -98,7 +113,7 @@ public class EasyFileProvider extends FileProvider {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is DownloadsProvider.
      */
-    public static boolean isDownloadsDocument(Uri uri) {
+    public static boolean isDownloadsDocument(@NonNull Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
 
@@ -106,7 +121,7 @@ public class EasyFileProvider extends FileProvider {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is MediaProvider.
      */
-    public static boolean isMediaDocument(Uri uri) {
+    public static boolean isMediaDocument(@NonNull Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }
