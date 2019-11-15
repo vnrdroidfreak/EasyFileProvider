@@ -22,6 +22,7 @@ public class EasyFileProvider extends FileProvider {
     final Context context;
 
     private EasyFileProvider(final Context context) {
+        super();
         this.context = context;
     }
 
@@ -37,8 +38,13 @@ public class EasyFileProvider extends FileProvider {
 
     @NonNull
     public Uri getUriBy(@NonNull File file) {
-        String provider = context.getPackageName() + "provider";
+        String provider = getProvider();
         return FileProvider.getUriForFile(context, provider, file);
+    }
+
+    @NonNull
+    public String getProvider(){
+        return context.getPackageName() + ".provider";
     }
 
     /*
